@@ -46,14 +46,14 @@ type MetricInfo struct {
 // wish to simply make use of stored information in their TSDB.
 type CustomMetricsProvider interface {
 	// GetRootScopedMetricByName fetches a particular metric for a particular root-scoped object.
-	GetRootScopedMetricByName(groupResource schema.GroupResource, name string, metricName string) (*custom_metrics.MetricValue, error)
+	GetRootScopedMetricByName(groupResource schema.GroupResource, name string, metricName string) (*custom_metrics.MetricValueList, error)
 
 	// GetRootScopedMetricByName fetches a particular metric for a set of root-scoped objects
 	// matching the given label selector.
 	GetRootScopedMetricBySelector(groupResource schema.GroupResource, selector labels.Selector, metricName string) (*custom_metrics.MetricValueList, error)
 
 	// GetNamespacedMetricByName fetches a particular metric for a particular namespaced object.
-	GetNamespacedMetricByName(groupResource schema.GroupResource, namespace string, name string, metricName string) (*custom_metrics.MetricValue, error)
+	GetNamespacedMetricByName(groupResource schema.GroupResource, namespace string, name string, metricName string) (*custom_metrics.MetricValueList, error)
 
 	// GetNamespacedMetricByName fetches a particular metric for a set of namespaced objects
 	// matching the given label selector.

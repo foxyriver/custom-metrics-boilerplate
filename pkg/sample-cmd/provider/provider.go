@@ -116,9 +116,15 @@ func (p *incrementalTestingProvider) metricsFor(totalValue int64, groupResource 
 	}, nil
 }
 
-func (p *incrementalTestingProvider) GetRootScopedMetricByName(groupResource schema.GroupResource, name string, metricName string) (*custom_metrics.MetricValue, error) {
+func (p *incrementalTestingProvider) GetRootScopedMetricByName(groupResource schema.GroupResource, name string, metricName string) (*custom_metrics.MetricValueList, error) {
 	value := p.valueFor(groupResource, metricName, false)
-	return p.metricFor(value, groupResource, "", name, metricName)
+	metric, err := p.metricFor(value, groupResource, "", name, metricName)
+	if err != nil {
+		return nil, err
+	}
+	return &custom_metrics.MetricValueList{
+		Items: []custom_metrics.MetricValue{*metric},
+	}, nil
 }
 
 
@@ -137,9 +143,15 @@ func (p *incrementalTestingProvider) GetRootScopedMetricBySelector(groupResource
 	return p.metricsFor(totalValue, groupResource, metricName, matchingObjectsRaw)
 }
 
-func (p *incrementalTestingProvider) GetNamespacedMetricByName(groupResource schema.GroupResource, namespace string, name string, metricName string) (*custom_metrics.MetricValue, error) {
+func (p *incrementalTestingProvider) GetNamespacedMetricByName(groupResource schema.GroupResource, namespace string, name string, metricName string) (*custom_metrics.MetricValueList, error) {
 	value := p.valueFor(groupResource, metricName, true)
-	return p.metricFor(value, groupResource, namespace, name, metricName)
+	metric, err := p.metricFor(value, groupResource, namespace, name, metricName)
+	if err != nil {
+		return nil, err
+	}
+	return &custom_metrics.MetricValueList{
+		Items: []custom_metrics.MetricValue{*metric},
+	}, nil
 }
 
 func (p *incrementalTestingProvider) GetNamespacedMetricBySelector(groupResource schema.GroupResource, namespace string, selector labels.Selector, metricName string) (*custom_metrics.MetricValueList, error) {
