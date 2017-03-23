@@ -26,7 +26,8 @@ import (
 	coreclient "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	"k8s.io/custom-metrics-boilerplate/pkg/cmd/server"
-	"k8s.io/custom-metrics-boilerplate/pkg/sample-cmd/provider"
+	defaultprovider "k8s.io/custom-metrics-boilerplate/pkg/provider/default"
+	"k8s.io/custom-metrics-boilerplate/pkg/sample-cmd/provider/prometheus"
 )
 
 // NewCommandStartMaster provides a CLI handler for 'start master' command
@@ -34,6 +35,8 @@ func NewCommandStartSampleAdapterServer(out, errOut io.Writer, stopCh <-chan str
 	baseOpts := server.NewCustomMetricsAdapterServerOptions(out, errOut)
 	o := SampleAdapterServerOptions{
 		CustomMetricsAdapterServerOptions: baseOpts,
+		PrometheusEndpoint: "http://prometheus.default.svc:9090",
+		Resolution: 60,
 	}
 
 	cmd := &cobra.Command{
@@ -63,6 +66,11 @@ func NewCommandStartSampleAdapterServer(out, errOut io.Writer, stopCh <-chan str
 		"kubeconfig file pointing at the 'core' kubernetes server with enough rights to list "+
 		"any described objets")
 
+	flags.StringVar(&o.PrometheusEndpoint, "prometheus-endpoint", o.PrometheusEndpoint, ""+
+		"URL to the prometheus instance")
+
+	flags.Int64Var(&o.Resolution, "resolution", o.Resolution, ""+
+		"resolution for metrics")
 
 	return cmd
 }
@@ -91,7 +99,9 @@ func (o SampleAdapterServerOptions) RunCustomMetricsAdapterServer(stopCh <-chan 
 		return fmt.Errorf("unable to construct lister client to initialize provider: %v", err)
 	}
 
-	cmProvider := provider.NewFakeProvider(client)
+	promImpl := prometheus.NewPrometheusImplementation(o.PrometheusEndpoint, o.Resolution)
+
+	cmProvider := defaultprovider.NewDefaultProvider(client, promImpl)
 
 	server, err := config.Complete().New(cmProvider)
 	if err != nil {
@@ -105,4 +115,8 @@ type SampleAdapterServerOptions struct {
 
 	// RemoteKubeConfigFile is the config used to list pods from the master API server
 	RemoteKubeConfigFile string
+
+	PrometheusEndpoint string
+
+	Resolution int64
 }
