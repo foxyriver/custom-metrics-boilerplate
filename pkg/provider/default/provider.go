@@ -58,6 +58,7 @@ func (p *DefaultMetricsProvider) metricFor(groupResource schema.GroupResource, n
 	}
 
 	value, window := p.impl.ValueForMetric(name, groupResource, namespace, metricName)
+	fmt.Println("metricFor", groupResource, namespace, name, metricName, value, window)
 
 	return &custom_metrics.MetricValue{
 		DescribedObject: api.ObjectReference{

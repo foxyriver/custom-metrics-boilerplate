@@ -46,6 +46,7 @@ type promCustomMetricsImplementation struct {
 }
 
 func (p *promCustomMetricsImplementation) ValueForMetric(name string, groupResource schema.GroupResource, namespace string, metricName string) (int64, int64) {
+	fmt.Println("in valueformetric", name, groupResource, namespace, metricName)
 	if !validateMetricName(metricName) {
 		return 0, p.resolutionSeconds
 	}
@@ -90,6 +91,7 @@ func (p *promCustomMetricsImplementation) ListAllMetrics() []provider.MetricInfo
 	metricInfo := []provider.MetricInfo{}
 
 	labelsEndpoint := fmt.Sprintf("%s/api/v1/label/__name__/values", p.endpoint)
+	fmt.Println(labelsEndpoint)
 	resp, err := http.Get(labelsEndpoint)
 	if err != nil {
 		return metricInfo
@@ -101,6 +103,7 @@ func (p *promCustomMetricsImplementation) ListAllMetrics() []provider.MetricInfo
 		return metricInfo
 	}
 	labelvals := &promLabelValues{}
+	fmt.Println("listall body", body)
 	err = json.Unmarshal(body, labelvals)
 	if err != nil {
 		return metricInfo
@@ -126,8 +129,10 @@ func (p *promCustomMetricsImplementation) ListAllMetrics() []provider.MetricInfo
 }
 
 func validateMetricName(metricName string) bool {
+	ret := strings.HasSuffix(metricName, "_total")
+	fmt.Printf("validate", metricName, ret)
 	// TODO: This should be so much more sophisticated
-	return strings.HasSuffix(metricName, "_total")
+	return ret
 }
 
 func buildQuery(name, resource, metricName, namespace string, resolutionSeconds int64) string {

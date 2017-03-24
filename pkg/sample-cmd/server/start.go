@@ -99,6 +99,8 @@ func (o SampleAdapterServerOptions) RunCustomMetricsAdapterServer(stopCh <-chan 
 		return fmt.Errorf("unable to construct lister client to initialize provider: %v", err)
 	}
 
+	fmt.Println("start")
+
 	promImpl := prometheus.NewPrometheusImplementation(o.PrometheusEndpoint, o.Resolution)
 
 	cmProvider := defaultprovider.NewDefaultProvider(client, promImpl)
