@@ -304,6 +304,8 @@ func (h *httpQueryAPI) Query(ctx context.Context, query string, ts time.Time) (m
 
 	u.RawQuery = q.Encode()
 
+	fmt.Println(u.String())
+
 	req, _ := http.NewRequest("GET", u.String(), nil)
 
 	_, body, err := h.client.do(ctx, req)

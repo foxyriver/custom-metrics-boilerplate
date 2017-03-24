@@ -103,7 +103,7 @@ func (p *promCustomMetricsImplementation) ListAllMetrics() []provider.MetricInfo
 		return metricInfo
 	}
 	labelvals := &promLabelValues{}
-	fmt.Println("listall body", body)
+	fmt.Println("listall body", string(body))
 	err = json.Unmarshal(body, labelvals)
 	if err != nil {
 		return metricInfo
